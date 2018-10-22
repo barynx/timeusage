@@ -139,9 +139,9 @@ object TimeUsage {
     // more sense for our use case
     // Hint: you can use the `when` and `otherwise` Spark functions
     // Hint: don’t forget to give your columns the expected name with the `as` method
-    val workingStatusProjection: Column = when(df.col("telfs").<(3).>=(1), "working").otherwise("not working").as("working")
-    val sexProjection: Column = when(df.col("tesex").equalTo(1),"male").otherwise("female").as("sex")
-    val ageProjection: Column = when(df.col("teage").<=(22).>=(15),"young").when(df.col("teage").<=(55).>=(23),"active").otherwise("elder").as("age")
+    val workingStatusProjection: Column = when(df.col("telfs") < 3, "working").otherwise("not working").as("working")
+    val sexProjection: Column = when(df.col("tesex") === 1,"male").otherwise("female").as("sex")
+    val ageProjection: Column = when(df.col("teage") >=15 && df.col("teage") <=22,"young").when(df.col("teage") >=23 && df.col("teage") <=55 ,"active").otherwise("elder").as("age")
 
     // Create columns that sum columns of the initial dataset
     // Hint: you want to create a complex column expression that sums other columns
@@ -198,7 +198,7 @@ object TimeUsage {
     * @param viewName Name of the SQL view to use
     */
   def timeUsageGroupedSqlQuery(viewName: String): String =
-    "SELECT working, sex, age, ROUND(AVG(primaryNeeds),1) AS primaryNeeds, ROUND(AVG(work),1) AS work, ROUND(AVG(other),1) AS other FROM" + viewName + "GROUP BY working, sex, age ORDER BY working, sex, age"
+    "SELECT working, sex, age, ROUND(AVG(primaryNeeds),1) AS primaryNeeds, ROUND(AVG(work),1) AS work, ROUND(AVG(other),1) AS other FROM " + viewName + " GROUP BY working, sex, age ORDER BY working, sex, age"
 
   /**
     * @return A `Dataset[TimeUsageRow]` from the “untyped” `DataFrame`
