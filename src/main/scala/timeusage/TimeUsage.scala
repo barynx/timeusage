@@ -66,13 +66,21 @@ object TimeUsage {
     * @param columnNames Column names of the DataFrame
     */
   def dfSchema(columnNames: List[String]): StructType =
-    StructType(columnNames.map(columnName => StructField(columnName, if (columnName == "tucaseid") StringType else DoubleType, false)))
+  {
+    val head  = StructField(columnNames.head, StringType, false)
+    val tail = columnNames.tail.map(columnName => StructField(columnName, DoubleType, false))
+    StructType(head::tail)
+  }
+
 
   /** @return An RDD Row compatible with the schema produced by `dfSchema`
     * @param line Raw fields
     */
-  def row(line: List[String]): Row =
-    Row.fromSeq(line)
+  def row(line: List[String]): Row = {
+    val fields = line.head :: line.tail.map(field => field.toDouble)
+
+    Row.fromSeq(fields)
+  }
 
   /** @return The initial data frame columns partitioned in three groups: primary needs (sleeping, eating, etc.),
     *         work and other (leisure activities)
